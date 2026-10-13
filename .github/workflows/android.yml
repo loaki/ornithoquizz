@@ -35,7 +35,7 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: wasm32-unknown-unknown,aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
+          targets: wasm32-unknown-unknown,aarch64-linux-android
 
       - uses: Swatinem/rust-cache@v2
 
@@ -56,7 +56,8 @@ jobs:
         working-directory: app
         env:
           NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/${{ env.NDK_VERSION }}
-        run: cargo tauri android build --apk
+        # arm64 only: the media is embedded in the native lib, so each extra ABI adds a full copy (~150 MB)
+        run: cargo tauri android build --apk --target aarch64
 
       - name: Sign APK
         env:
