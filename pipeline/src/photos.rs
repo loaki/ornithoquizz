@@ -24,8 +24,9 @@ pub struct MediaRow {
 
 /// Candidates requested per species. Constant so cached answers keep being reused.
 const CANDIDATES: usize = 15;
-/// iNaturalist annotation "Evidence of presence" = "Feather".
-const FEATHER_FILTER: &str = "&term_id=22&term_value_id=23";
+/// iNaturalist annotation "Evidence of presence" = "Feather", minus observations annotated "Dead"
+/// (a carcass often carries the feather annotation too). Review new results anyway: see feather_blocklist.txt.
+const FEATHER_FILTER: &str = "&term_id=22&term_value_id=23&without_term_value_id=19";
 
 pub fn save(out: &Path, name: &str, rows: &[MediaRow]) -> Result<()> {
     fs::write(out.join(name), serde_json::to_string_pretty(rows)?)?;
