@@ -95,6 +95,23 @@ fn SoundPlayer(media: Media) -> impl IntoView {
     let playing = RwSignal::new(false);
     let fraction = RwSignal::new(0.0_f64);
     let slow = RwSignal::new(false);
+    // Play from an in-memory blob: Android's asset handler has no range requests,
+    // so streamed Ogg/Opus reports an infinite duration and the waveform never fills.
+    let src = RwSignal::new(None::<String>);
+    let blob = std::sync::Arc::new(std::sync::Mutex::new(None::<String>));
+    {
+        let (path, blob) = (format!("media/{}", media.file), blob.clone());
+        leptos::task::spawn_local(async move {
+            let url = blob_url(&path).await;
+            *blob.lock().unwrap() = url.clone();
+            src.try_set(Some(url.unwrap_or(path)));
+        });
+    }
+    on_cleanup(move || {
+        if let Some(url) = blob.lock().unwrap().take() {
+            let _ = web_sys::Url::revoke_object_url(&url);
+        }
+    });
 
     let toggle = move |_| {
         if let Some(a) = audio.get() {
@@ -141,7 +158,7 @@ fn SoundPlayer(media: Media) -> impl IntoView {
         <div class="player">
             <audio
                 node_ref=audio
-                src=format!("media/{}", media.file)
+                src=move || src.get()
                 preload="auto"
                 on:timeupdate=move |_| {
                     if let Some(a) = audio.get() {
@@ -222,7 +239,7 @@ fn App(catalog: Arc<Catalog>) -> impl IntoView {
                 <div class="topbar">
                     <span class="logo"><img src="logo.svg" alt="" width="28" height="28"/>"ornitho"<span>"quizz"</span></span>
                     <div class="top-actions">
-                        <button class="pill" on:click=move |_| screen.set(Screen::Regions)>"📍 "{region_label.clone()}</button>
+                        <button class="pill" on:click=move |_| screen.set(Screen::Regions)>{region_label.clone()}</button>
                         <button class="pill" on:click=move |_| lang.update(|l| *l = if *l == Lang::En { Lang::Fr } else { Lang::En })>
                             {move || if lang.get() == Lang::En { "EN" } else { "FR" }}
                         </button>
@@ -446,6 +463,17 @@ fn App(catalog: Arc<Catalog>) -> impl IntoView {
         Screen::Quiz => quiz_view().into_any(),
         Screen::Result => result_view().into_any(),
     }
+}
+
+/// Fetches a sound clip into a `blob:` URL, so the player knows its full length.
+async fn blob_url(path: &str) -> Option<String> {
+    let resp = gloo_net::http::Request::get(path).send().await.ok().filter(|r| r.ok())?;
+    let bytes = resp.binary().await.ok()?;
+    let parts = js_sys::Array::of1(&js_sys::Uint8Array::from(bytes.as_slice()));
+    let opts = web_sys::BlobPropertyBag::new();
+    opts.set_type("audio/ogg");
+    let blob = web_sys::Blob::new_with_u8_array_sequence_and_options(&parts, &opts).ok()?;
+    web_sys::Url::create_object_url_with_blob(&blob).ok()
 }
 
 async fn load_catalog() -> Result<Catalog, String> {
