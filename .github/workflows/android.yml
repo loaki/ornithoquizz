@@ -5,6 +5,15 @@ on:
   push:
     tags: ["v*"]
 
+permissions:
+  contents: write
+
+env:
+  # Android 16
+  ANDROID_API: "36"
+  BUILD_TOOLS: "36.0.0"
+  NDK_VERSION: "27.2.12479018"
+
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -18,8 +27,8 @@ jobs:
 
       - uses: android-actions/setup-android@v3
 
-      - name: Install NDK
-        run: sdkmanager "ndk;27.2.12479018"
+      - name: Install SDK platform, build tools and NDK
+        run: sdkmanager "platforms;android-${ANDROID_API}" "build-tools;${BUILD_TOOLS}" "ndk;${NDK_VERSION}"
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -30,15 +39,46 @@ jobs:
       - name: Install trunk and tauri-cli
         run: cargo install trunk tauri-cli --locked
 
+      - name: Generate Android project
+        working-directory: app
+        env:
+          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/${{ env.NDK_VERSION }}
+        run: |
+          cargo tauri android init
+          # Compile and target the latest Android API level
+          sed -i -E "s/compileSdk = [0-9]+/compileSdk = ${ANDROID_API}/; s/targetSdk = [0-9]+/targetSdk = ${ANDROID_API}/" src-tauri/gen/android/app/build.gradle.kts
+          grep -E "compileSdk|targetSdk|minSdk" src-tauri/gen/android/app/build.gradle.kts
+
       - name: Build APK
         working-directory: app
         env:
-          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.2.12479018
+          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/${{ env.NDK_VERSION }}
+        run: cargo tauri android build --apk
+
+      - name: Sign APK
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          cargo tauri android init
-          cargo tauri android build --apk
+          tools="$ANDROID_HOME/build-tools/$BUILD_TOOLS"
+          unsigned=$(find app/src-tauri/gen/android/app/build/outputs/apk -name '*-release-unsigned.apk' | head -1)
+          name="ornithoquizz-${GITHUB_REF_NAME}.apk"
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.p12"
+          "$tools/zipalign" -p -f 4 "$unsigned" "$RUNNER_TEMP/aligned.apk"
+          "$tools/apksigner" sign --ks "$RUNNER_TEMP/release.p12" --ks-type PKCS12 \
+            --ks-pass env:KEYSTORE_PASSWORD --out "$name" "$RUNNER_TEMP/aligned.apk"
+          "$tools/apksigner" verify --print-certs "$name"
+          rm "$RUNNER_TEMP/release.p12"
+          echo "APK=$name" >> "$GITHUB_ENV"
 
       - uses: actions/upload-artifact@v4
         with:
           name: ornithoquizz-apk
-          path: app/src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          path: ${{ env.APK }}
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.APK }}
+          generate_release_notes: true

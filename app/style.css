@@ -1,4 +1,4 @@
-/* Night Forest theme. Fonts are bundled in ./fonts: nothing loads from the network. */
+/* Night Forest theme, Feather Q identity (logo in branding/). Fonts are bundled in ./fonts: nothing loads from the network. */
 @font-face { font-family: "Space Grotesk"; src: url("fonts/SpaceGrotesk.ttf"); font-weight: 300 700; }
 @font-face { font-family: "JetBrains Mono"; src: url("fonts/JetBrainsMono.ttf"); font-weight: 100 800; }
 :root {
@@ -30,6 +30,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .mode:disabled { opacity: .45; cursor: default; }
 .mode b { font-size: 17px; display: block; }
 .mode small { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.mode .glyph { width: 24px; height: 24px; color: var(--accent); }
+.mode .glyph svg { width: 100%; height: 100%; display: block; }
+.mode.hero { background: var(--accent); border-color: transparent; color: var(--on-accent); }
+.mode.hero .glyph, .mode.hero small { color: var(--on-accent); }
+.hello { margin: 4px 0 0; font-size: 28px; font-weight: 600; line-height: 1.15; letter-spacing: -.01em; }
 
 .bar { height: 4px; border-radius: 2px; background: var(--line); }
 .bar > div { height: 100%; border-radius: 2px; background: var(--accent); transition: width .2s; }

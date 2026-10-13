@@ -89,7 +89,7 @@ fn riddle(section: &str, sp: &SpeciesRow) -> Option<String> {
     let mut names: Vec<String> = vec![sp.name_en.clone(), sp.name_fr.clone(), sp.scientific.clone(), genus.to_string()];
     // Short forms: "robin" for "European Robin", "rougegorge" for "Rougegorge familier".
     for name in [&sp.name_en, &sp.name_fr] {
-        if let Some(w) = name.split(|c: char| !c.is_alphanumeric()).last().filter(|_| name.contains(' ') || name.contains('-')) {
+        if let Some(w) = name.split(|c: char| !c.is_alphanumeric()).next_back().filter(|_| name.contains(' ') || name.contains('-')) {
             names.push(w.to_string());
         }
         if let Some(w) = name.split(|c: char| !c.is_alphanumeric()).next() {

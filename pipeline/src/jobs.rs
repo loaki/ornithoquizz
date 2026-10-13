@@ -44,7 +44,7 @@ pub fn run(jobs: Vec<Job>, threads: usize, client: &reqwest::blocking::Client) {
                 }
                 let mut d = done.lock().unwrap();
                 *d += 1;
-                if *d % 100 == 0 {
+                if d.is_multiple_of(100) {
                     println!("  downloads {}/{total}", *d);
                 }
             });

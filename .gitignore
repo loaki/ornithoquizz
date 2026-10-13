@@ -5,3 +5,4 @@ dist/
 .env
 app/dist/
 app/icon-source.png
+keys/

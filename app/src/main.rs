@@ -9,6 +9,12 @@ use std::sync::Arc;
 const QUIZ_LEN: usize = 10;
 const N_OPTIONS: usize = 4;
 
+// Mode glyphs, drawn in currentColor so they follow the tile's text color.
+const GLYPH_PHOTO: &str = r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M9 6l1.5-2h3L15 6"/></svg>"#;
+const GLYPH_SOUND: &str = r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2"/></svg>"#;
+const GLYPH_FEATHER: &str = r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4C11 4 6 10 6 18"/><path d="M20 4c0 8-5 13-13 13"/><path d="M4 20l3-3"/></svg>"#;
+const GLYPH_TEXT: &str = r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6h14M5 11h14M5 16h9"/></svg>"#;
+
 #[derive(Clone, Copy, PartialEq)]
 enum Screen {
     Home,
@@ -222,6 +228,7 @@ fn App(catalog: Arc<Catalog>) -> impl IntoView {
                         </button>
                     </div>
                 </div>
+                <h1 class="hello">{move || if lang.get() == Lang::En { "Which bird is it today?" } else { "Quel oiseau aujourd'hui ?" }}</h1>
                 <div class="stats">
                     <div><b>{move || progress.with(|p| p.correct_total())}</b><small>{move || if lang.get() == Lang::En { "correct" } else { "bonnes réponses" }}</small></div>
                     <div><b>{move || progress.with(|p| p.0.len())}</b><small>{move || if lang.get() == Lang::En { "seen" } else { "vus" }}</small></div>
@@ -241,16 +248,18 @@ fn App(catalog: Arc<Catalog>) -> impl IntoView {
                 <span class="mono">{move || if lang.get() == Lang::En { "Modes" } else { "Modes de jeu" }}</span>
                 <div class="mode-grid">
                     {[
-                        (QuizMode::Photo, "Photo", "Photo"),
-                        (QuizMode::Sound, "Song", "Chant"),
-                        (QuizMode::Feather, "Feather", "Plume"),
-                        (QuizMode::Description, "Field notes", "Description"),
+                        (QuizMode::Photo, "Photo", "Photo", GLYPH_PHOTO),
+                        (QuizMode::Sound, "Song", "Chant", GLYPH_SOUND),
+                        (QuizMode::Feather, "Feather", "Plume", GLYPH_FEATHER),
+                        (QuizMode::Description, "Field notes", "Description", GLYPH_TEXT),
                     ]
                         .into_iter()
-                        .map(|(mode, en, fr)| {
+                        .map(|(mode, en, fr, glyph)| {
                             let (p, count, start) = (playable.clone(), bird_count.clone(), start.clone());
                             view! {
-                                <button class="mode" disabled={ let p = p.clone(); move || !p(mode) } on:click=move |_| start(mode)>
+                                <button class="mode" class:hero=mode == QuizMode::Photo disabled={ let p = p.clone(); move || !p(mode) } on:click=move |_| start(mode)>
+                                    <span class="glyph" inner_html=glyph></span>
+                                    <span>
                                     <b>{move || if lang.get() == Lang::En { en } else { fr }}</b>
                                     <small>{move || {
                                         let n = count(mode);
@@ -261,6 +270,7 @@ fn App(catalog: Arc<Catalog>) -> impl IntoView {
                                             (false, false) => "pas assez d'oiseaux".to_string(),
                                         }
                                     }}</small>
+                                    </span>
                                 </button>
                             }
                         })
