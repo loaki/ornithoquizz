@@ -26,6 +26,9 @@ jobs:
           java-version: 17
 
       - uses: android-actions/setup-android@v3
+        with:
+          # The default also asks for the removed "tools" package, which fails
+          packages: platform-tools
 
       - name: Install SDK platform, build tools and NDK
         run: sdkmanager "platforms;android-${ANDROID_API}" "build-tools;${BUILD_TOOLS}" "ndk;${NDK_VERSION}"
