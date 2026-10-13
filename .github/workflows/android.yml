@@ -48,6 +48,8 @@ jobs:
           NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/${{ env.NDK_VERSION }}
         run: |
           cargo tauri android init
+          # init generates Tauri's default launcher icons: replace them with ours
+          cp -r src-tauri/icons/android/. src-tauri/gen/android/app/src/main/res/
           # Compile and target the latest Android API level
           sed -i -E "s/compileSdk = [0-9]+/compileSdk = ${ANDROID_API}/; s/targetSdk = [0-9]+/targetSdk = ${ANDROID_API}/" src-tauri/gen/android/app/build.gradle.kts
           grep -E "compileSdk|targetSdk|minSdk" src-tauri/gen/android/app/build.gradle.kts
@@ -66,7 +68,7 @@ jobs:
         run: |
           tools="$ANDROID_HOME/build-tools/$BUILD_TOOLS"
           unsigned=$(find app/src-tauri/gen/android/app/build/outputs/apk -name '*-release-unsigned.apk' | head -1)
-          name="ornithoquizz-${GITHUB_REF_NAME}.apk"
+          name="quizzozoizo-${GITHUB_REF_NAME}.apk"
           echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.p12"
           "$tools/zipalign" -p -f 4 "$unsigned" "$RUNNER_TEMP/aligned.apk"
           "$tools/apksigner" sign --ks "$RUNNER_TEMP/release.p12" --ks-type PKCS12 \
@@ -77,7 +79,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ornithoquizz-apk
+          name: quizzozoizo-apk
           path: ${{ env.APK }}
 
       - name: Publish release

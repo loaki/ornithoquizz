@@ -1,10 +1,10 @@
 [package]
-name = "ornithoquizz"
+name = "quizzozoizo"
 version = "0.1.0"
 edition.workspace = true
 
 [lib]
-name = "ornithoquizz_lib"
+name = "quizzozoizo_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

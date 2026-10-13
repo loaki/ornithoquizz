@@ -2783,36 +2783,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8c04f5d74368e4d0dfe06c45c8627c81bd7c317d52762d118fb9b3076f6420fd"
 
 [[package]]
-name = "ornitho-ui"
-version = "0.1.0"
-dependencies = [
- "console_error_panic_hook",
- "gloo-net",
- "js-sys",
- "leptos",
- "model",
- "quiz-core",
- "serde",
- "serde-wasm-bindgen",
- "serde_json",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
-]
-
-[[package]]
-name = "ornithoquizz"
-version = "0.1.0"
-dependencies = [
- "model",
- "quiz-core",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
-]
-
-[[package]]
 name = "pango"
 version = "0.18.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3223,6 +3193,36 @@ name = "quiz-core"
 version = "0.1.0"
 dependencies = [
  "model",
+]
+
+[[package]]
+name = "quizzozoizo"
+version = "0.1.0"
+dependencies = [
+ "model",
+ "quiz-core",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+]
+
+[[package]]
+name = "quizzozoizo-ui"
+version = "0.1.0"
+dependencies = [
+ "console_error_panic_hook",
+ "gloo-net",
+ "js-sys",
+ "leptos",
+ "model",
+ "quiz-core",
+ "serde",
+ "serde-wasm-bindgen",
+ "serde_json",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
 ]
 
 [[package]]

@@ -33,7 +33,7 @@ impl Client {
         let cache_dir = cache_dir.into();
         fs::create_dir_all(&cache_dir)?;
         let inner = reqwest::blocking::Client::builder()
-            .user_agent("ornithoquizz-pipeline/0.1 (personal offline bird quiz)")
+            .user_agent("quizzozoizo-pipeline/0.1 (personal offline bird quiz)")
             .timeout(Duration::from_secs(60))
             .build()?;
         Ok(Self { inner, cache_dir, min_delay, last: Cell::new(None) })

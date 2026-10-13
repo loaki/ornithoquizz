@@ -5,7 +5,7 @@ use quiz_core::leitner;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-const KEY: &str = "ornitho.progress.v2";
+const KEY: &str = "quizzozoizo.progress.v2";
 
 #[derive(Clone, Copy, Default, Serialize, Deserialize)]
 pub struct Entry {
@@ -69,11 +69,11 @@ impl Progress {
 
 /// Small string preferences (difficulty...) kept next to the progress.
 pub fn load_pref(key: &str) -> Option<String> {
-    storage()?.get_item(&format!("ornitho.pref.{key}")).ok()?
+    storage()?.get_item(&format!("quizzozoizo.pref.{key}")).ok()?
 }
 
 pub fn save_pref(key: &str, value: &str) {
     if let Some(s) = storage() {
-        let _ = s.set_item(&format!("ornitho.pref.{key}"), value);
+        let _ = s.set_item(&format!("quizzozoizo.pref.{key}"), value);
     }
 }

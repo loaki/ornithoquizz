@@ -12,7 +12,7 @@ use clap::{Parser, Subcommand};
 use std::{fs, path::PathBuf, time::Duration};
 
 #[derive(Parser)]
-#[command(about = "Builds the OrnithoQuizz offline data set")]
+#[command(about = "Builds the Quizzozoizo offline data set")]
 struct Cli {
     /// Where downloaded responses are cached.
     #[arg(long, default_value = "data/cache")]

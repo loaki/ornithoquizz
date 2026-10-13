@@ -237,7 +237,7 @@ fn App(catalog: Arc<Catalog>) -> impl IntoView {
         view! {
             <main class="screen">
                 <div class="topbar">
-                    <span class="logo"><img src="logo.svg" alt="" width="28" height="28"/>"ornitho"<span>"quizz"</span></span>
+                    <span class="logo"><img src="logo.svg" alt="" width="28" height="28"/>"quizzo"<span>"zoizo"</span></span>
                     <div class="top-actions">
                         <button class="pill" on:click=move |_| screen.set(Screen::Regions)>{region_label.clone()}</button>
                         <button class="pill" on:click=move |_| lang.update(|l| *l = if *l == Lang::En { Lang::Fr } else { Lang::En })>
