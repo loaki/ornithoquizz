@@ -184,7 +184,7 @@ fn SoundPlayer(media: Media) -> impl IntoView {
 #[component]
 fn App(catalog: Arc<Catalog>) -> impl IntoView {
     let screen = RwSignal::new(Screen::Home);
-    let lang = RwSignal::new(Lang::En);
+    let lang = RwSignal::new(Lang::Fr);
     let quiz = RwSignal::new(None::<QuizState>);
     let progress = RwSignal::new(Progress::load());
     let difficulty = RwSignal::new(match progress::load_pref("difficulty").as_deref() {
