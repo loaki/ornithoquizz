@@ -1,0 +1,17 @@
+[workspace]
+resolver = "2"
+members = ["crates/model", "crates/quiz-core", "pipeline", "app", "app/src-tauri"]
+# The frontend builds for wasm (trunk) and the Tauri shell only in CI/Android: plain cargo skips both.
+default-members = ["crates/model", "crates/quiz-core", "pipeline"]
+
+[workspace.package]
+edition = "2021"
+license = "MIT"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1

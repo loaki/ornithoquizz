@@ -1,0 +1,7 @@
+target/
+dist/
+/data/cache/
+/data/out/
+.env
+app/dist/
+app/icon-source.png
